@@ -22,11 +22,13 @@ public class ReadWorker extends SwingWorker<Void, Void> {
 
     public Void doInBackground() {
         System.out.println("Started read worker");
-        Message m = null;
+        BoardUpdater updater = null;
         try {
-            while((m = (Message)inputStream.readObject())!= null) {
-                System.out.println(m);
-                parent.display(m);
+            while((updater = (BoardUpdater)inputStream.readObject())!= null) {
+                TileBtn prevTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getPrevRow()][updater.getPrevColumn()];
+                TileBtn nextTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getPrevRow()][updater.getPrevColumn()];
+                System.out.println(prevTileBtn.getBoardPiece());
+                this.parent.getController().getBoard().movePiece(prevTileBtn, nextTileBtn);
             }
         }catch(ClassNotFoundException e) {
             e.printStackTrace();

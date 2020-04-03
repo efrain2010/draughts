@@ -1,9 +1,10 @@
 import java.awt.Cursor;
+import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-public class Piece extends JButton {
+public class Piece extends JButton implements Serializable {
 
     /**
      *
@@ -80,7 +81,7 @@ public class Piece extends JButton {
     }
 
     public boolean isPlayerOne() {
-        return this.player.getPlayerNumber() == 1;
+        return this.color == "white";
     }
     
     public boolean isSamePlayer(Piece piece) {

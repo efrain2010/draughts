@@ -1,9 +1,10 @@
-import java.awt.Dimension;
+
+import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-public class TileBtn extends JButton {
+public class TileBtn extends JButton implements Serializable {
 
     private int row;
     private int column;

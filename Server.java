@@ -31,10 +31,10 @@ public class Server implements Runnable{
         }
     }
     
-    public void transmit(Message m) {
+    public void transmit(BoardUpdater updater) {
         for(ClientRunner c: clients) {
             if(c != null) {
-                c.transmitMessage(m);
+                c.transmitMessage(updater);
             }
         }
     }

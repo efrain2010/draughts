@@ -1,14 +1,14 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements Serializable {
 
     private String name;
     private int playerNumber;
     private ArrayList<Piece> pieces;
     
-    public Player(String name, int playerNumber) {
+    public Player(String name) {
         this.name = name;
-        this.playerNumber = playerNumber;
         this.pieces = new ArrayList<Piece>();
     }
 

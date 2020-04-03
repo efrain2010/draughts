@@ -24,10 +24,10 @@ public class ClientRunner implements Runnable {
     public void run() {
         // receive messages
         try {
-            Message message = null;
+            BoardUpdater updater = null;
             // cambiar esto a la clase que lo controlará
-            while((message = (Message)inputStream.readObject())!= null) {
-                this.parent.transmit(message);
+            while((updater = (BoardUpdater)inputStream.readObject())!= null) {
+                this.parent.transmit(updater);
             }
             inputStream.close();
         }catch(ClassNotFoundException e) {
@@ -37,9 +37,9 @@ public class ClientRunner implements Runnable {
         }
     }
     
-    public void transmitMessage(Message m) {
+    public void transmitMessage(BoardUpdater updater) {
         try {
-            outputStream.writeObject(m);
+            outputStream.writeObject(updater);
         }catch(IOException e) {
             e.printStackTrace();
         }

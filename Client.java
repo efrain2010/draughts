@@ -1,27 +1,12 @@
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingWorker;
-
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-public class Client extends JFrame implements ActionListener {
+public class Client {
 
     private Socket server = null;
-    private JTextArea textArea;
     private ObjectOutputStream outputStream;
-    private JTextField messageField;
-    private JButton sendButton;
     private String name;
+    private Controller controllerObject;
 
     public Client() {
         // this.setSize(800,500);
@@ -40,7 +25,7 @@ public class Client extends JFrame implements ActionListener {
         // bottomPanel.add(sendButton);
         // panel.add(bottomPanel,BorderLayout.SOUTH);
 
-        this.setVisible(true);
+        // this.setVisible(true);
 
         connect();
 
@@ -52,7 +37,13 @@ public class Client extends JFrame implements ActionListener {
 
         ReadWorker rw = new ReadWorker(server,this);
         rw.execute();
+
+        this.controllerObject = new Controller(new Model(), outputStream);
         System.out.println("HERE");
+    }
+
+    public Controller getController() {
+        return this.controllerObject;
     }
 
     private void connect() {
@@ -64,21 +55,21 @@ public class Client extends JFrame implements ActionListener {
         }
     }
     
-    public void display(Message m) {
-        textArea.append(m.toString() + '\n');
-    }
+    // public void display(Message m) {
+    //     textArea.append(m.toString() + '\n');
+    // }
     
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == sendButton) {
-            String messageText = messageField.getText();
-            try {
-                outputStream.writeObject(new Message(messageText,name));
-                messageField.setText("");
-            }catch(IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+    // public void actionPerformed(ActionEvent e) {
+    //     if(e.getSource() == sendButton) {
+    //         String messageText = messageField.getText();
+    //         try {
+    //             outputStream.writeObject(new Message(messageText,name));
+    //             messageField.setText("");
+    //         }catch(IOException ex) {
+    //             ex.printStackTrace();
+    //         }
+    //     }
+    // }
 
     public static void main(String[] args) {
         new Client();

@@ -2,7 +2,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.text.html.HTMLDocument.Iterator;
 
 import java.awt.*;
 
@@ -19,32 +18,43 @@ public class Board extends JFrame {
     private JPanel masterPanel, boardPanel;
     private Controller controllerObject;
     private Piece pieceInMove;
-    private JButton newGameBtn, endGameBtn;
+    private JButton newGameBtn, endGameBtn, playerOneBtn, playerTwoBtn;
     private JLabel winnerLabel;
     private ArrayList<TileBtn> possibleMoves, clickableBtns;
     private HashMap<TileBtn, TileBtn> eatMoves;
     private String movementColor = "#add8e6";
-    private Player playerInTurn;
+    private Player playerInTurn, playerOne, playerTwo;
+    private ArrayList<Piece> playerOnePieces, playerTwoPieces;
 
     public Board(Controller controllerObject) {
         this.controllerObject = controllerObject;
-        this.playerInTurn = controllerObject.getPlayers().get(0);
+        // this.playerInTurn = controllerObject.getPlayers().get(0);
+        this.playerOnePieces = new ArrayList<Piece>();
+        this.playerTwoPieces = new ArrayList<Piece>();
         this.squareBtns = new TileBtn[this.numerOfSquares][this.numerOfSquares];
         setdata();
         createScreen();
     }
 
-    public static String askNameView(int numPlayer) {
-    	return JOptionPane.showInputDialog(new JFrame(), "Player " + numPlayer + " name");
+    public static String askNameView() {
+    	return JOptionPane.showInputDialog(new JFrame(), "New Player name");
     }
 
     private void setdata() {
         this.possibleMoves = new ArrayList<TileBtn>();
         this.clickableBtns = new ArrayList<TileBtn>();
         this.eatMoves = new HashMap<TileBtn, TileBtn>();
-        for(Player p : this.controllerObject.getPlayers()) {
-            p.setStakes(new ArrayList<Piece>());
+    }
+
+    public void setPlayer(int num, Player player) {
+        if(num == 1) {
+            this.playerOne = player;
+            this.playerOne.setStakes(this.playerOnePieces);
+        } else {
+            this.playerTwo = player;
+            this.playerTwo.setStakes(this.playerTwoPieces);
         }
+        this.newGameBtn.setEnabled(true);
     }
 
     private void createScreen() {
@@ -67,8 +77,17 @@ public class Board extends JFrame {
         controlsPanel.add(this.winnerLabel);
 
         this.newGameBtn = new JButton("Start Game");
+        this.newGameBtn.setEnabled(false);
         this.newGameBtn.addActionListener(this.controllerObject);
         controlsPanel.add(this.newGameBtn);
+        
+        this.playerOneBtn = new JButton("Select Player 1");
+        this.playerOneBtn.addActionListener(this.controllerObject);
+        controlsPanel.add(this.playerOneBtn);
+        
+        this.playerTwoBtn = new JButton("Select Player 2");
+        this.playerTwoBtn.addActionListener(this.controllerObject);
+        controlsPanel.add(this.playerTwoBtn);
         
         this.endGameBtn = new JButton("End Game");
         this.endGameBtn.addActionListener(this.controllerObject);
@@ -114,14 +133,14 @@ public class Board extends JFrame {
                     Piece piece = new Piece(i, j, false);
                     if(i < this.numerOfSquares/2-1) {
                         piece.setColor("red"); 
-                        piece.setPlayer(this.controllerObject.getPlayers().get(1));
-                        this.controllerObject.getPlayers().get(1).addPiece(piece);
+                        // piece.setPlayer(this.playerOne);
+                        // this.playerOnePieces.add(piece);
                         this.squareBtns[i][j].setBoardPiece(piece);
                         this.squareBtns[i][j].setIcon(new ImageIcon(piece.getImage()));
                     } else if(i > this.numerOfSquares/2) {
                         piece.setColor("white"); 
-                        piece.setPlayer(this.controllerObject.getPlayers().get(0));
-                        this.controllerObject.getPlayers().get(0).addPiece(piece);
+                        // piece.setPlayer(this.playerTwo);
+                        // this.playerTwoPieces.add(piece);
                         this.squareBtns[i][j].setBoardPiece(piece);
                         this.squareBtns[i][j].setIcon(new ImageIcon(piece.getImage()));
                     }
@@ -133,10 +152,17 @@ public class Board extends JFrame {
     public void setNewGame() {
         this.newGameBtn.setVisible(false);
         this.endGameBtn.setVisible(true);
+        this.playerOneBtn.setVisible(false);
+        this.playerTwoBtn.setVisible(false);
         setdata();
         setPlayers();
-        this.winnerLabel.setText(this.playerInTurn.getName()+"'s turn");
-        this.winnerLabel.setVisible(true);
+        // this.winnerLabel.setText(this.playerInTurn.getName()+"'s turn");
+        // this.winnerLabel.setVisible(true);
+    }
+
+    public void movePiece(TileBtn prevTileBtn, TileBtn nextTileBtn) {
+        this.takePiece(prevTileBtn);
+        this.putPiece(nextTileBtn);
     }
     
     public void endGame() {
@@ -165,6 +191,22 @@ public class Board extends JFrame {
         return this.endGameBtn;
     }
 
+    public Player getPlayerOne() {
+        return this.playerOne;
+    }
+
+    public Player getPlayerTwo() {
+        return this.playerTwo;
+    }
+
+    public JButton getPlayerOneBtn() {
+        return this.playerOneBtn;
+    }
+
+    public JButton getPlayerTwoBtn() {
+        return this.playerTwoBtn;
+    }
+
     public JButton[][] getSquareBtns() {
         return this.squareBtns;
     }
@@ -178,10 +220,10 @@ public class Board extends JFrame {
     }
 
     public void nextTurn() {
-        if(this.playerInTurn == this.controllerObject.getPlayers().get(0)) {
-            this.playerInTurn = this.controllerObject.getPlayers().get(1);
+        if(this.playerInTurn == this.playerOne) {
+            this.playerInTurn = this.playerTwo;
         } else {
-            this.playerInTurn = this.controllerObject.getPlayers().get(0);
+            this.playerInTurn = this.playerOne;
         }
         this.winnerLabel.setText(this.playerInTurn.getName() + "'s turn");
         this.winnerLabel.setVisible(true);
@@ -223,14 +265,14 @@ public class Board extends JFrame {
     }
 
     public void showWinner(Player player) {
-        this.winnerLabel.setText("PLAYER " + player.getName() + " WON!!!");
-        for(TileBtn btn : this.clickableBtns) {
-            btn.setEnabled(false);
-        }
+        // this.winnerLabel.setText("PLAYER " + player.getName() + " WON!!!");
+        // for(TileBtn btn : this.clickableBtns) {
+        //     btn.setEnabled(false);
+        // }
     }
 
     private void checkIfCrowned(TileBtn btn) {
-        if(btn.getBoardPiece().getPlayer().getPlayerNumber() == 1) {
+        if(btn.getBoardPiece().isPlayerOne()) {
             if(btn.getBoardPiece().getRow() == 0) {
                 btn.crownPiece();
             }
@@ -349,9 +391,9 @@ public class Board extends JFrame {
     private void checkIfAte(TileBtn tileBtn) {
         TileBtn ateTile = this.eatMoves.get(tileBtn);
         if(ateTile.getBoardPiece().getPlayer().getPlayerNumber() == 1) {
-            this.controllerObject.getPlayers().get(0).removeStake(ateTile.getBoardPiece());
+            this.playerOne.removeStake(ateTile.getBoardPiece());
         } else {
-            this.controllerObject.getPlayers().get(1).removeStake(ateTile.getBoardPiece());
+            this.playerTwo.removeStake(ateTile.getBoardPiece());
         }
         this.squareBtns[ateTile.getRow()][ateTile.getColumn()].removeBoardPiece();
         this.eatMoves.clear();
