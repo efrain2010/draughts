@@ -32,12 +32,20 @@ public class Player {
         this.pieces = pieces;
     }
 
-    public ArrayList<Piece> getStakes() {
+    public ArrayList<Piece> getPieces() {
         return this.pieces;
     }
 
-    public void addStake(Piece pieces) {
-        this.pieces.add(pieces);
+    public void addPiece(Piece piece) {
+        this.pieces.add(piece);
+    }
+    
+    public void removeStake(Piece piece) {
+        this.pieces.remove(piece);
+    }
+
+    public String toString() {
+        return "I am " + this.name;
     }
 
 }

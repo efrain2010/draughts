@@ -10,19 +10,20 @@ public class Piece extends JButton {
      */
     private static final long serialVersionUID = 1L;
     private String color;
-    private int x;
-    private int y;
+    private int row;
+    private int column;
     private boolean isKing;
+    private Player player;
 
-    public Piece(int x, int y, boolean isKing) {
-        this.x = x;
-        this.y = y;
+    public Piece(int row, int column, boolean isKing) {
+        this.row = row;
+        this.column = column;
         this.isKing = isKing;
         
         this.setSize(50, 50);
         this.setOpaque(false);
         this.setBorderPainted(false);
-        this.setImage();
+        // this.setImage();
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
@@ -34,20 +35,28 @@ public class Piece extends JButton {
         this.color = color;
     }
 
-    public int getX() {
-        return x;
+    public int getRow() {
+        return row;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public void setRow(int row) {
+        this.row = row;
     }
 
-    public int getY() {
-        return y;
+    public int getColumn() {
+        return column;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public boolean getIsKing() {
@@ -58,16 +67,24 @@ public class Piece extends JButton {
         this.isKing = isKing;
     }
 
-    public void setImage() {
+    public String getImage() {
         String image = this.color + ".png";
         if(this.isKing == true) {
             image = "king-" + image;
         }
-        this.setIcon(new ImageIcon(image));
+        return image;
     }
 
     public String toString() {
-        return color + " piece, coords: " + x + " - " + y;
+        return color + " piece, coords: " + row + " - " + column;
+    }
+
+    public boolean isPlayerOne() {
+        return this.player.getPlayerNumber() == 1;
+    }
+    
+    public boolean isSamePlayer(Piece piece) {
+        return this.player == piece.getPlayer();
     }
 
 }
