@@ -1,22 +1,37 @@
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.ArrayList;
 
 public class Player implements Serializable {
 
-    private String name;
+    private int name;
     private int playerNumber;
     private ArrayList<Piece> pieces;
+    private Socket socket;
+    private Player opponent;
+    private Game gameObject;
     
-    public Player(String name) {
-        this.name = name;
+    public Player(Game game, Socket socket, int playerNumber) {
+        this.gameObject = game;
+        this.socket = socket;
+        this.playerNumber = playerNumber;
+
+        System.out.println(playerNumber);
+        // if(playerNumber == 1) {
+        //     this.gameObject.setCurrentPlayer(this);
+        // } else {
+        //     this.opponent = this.gameObject.getCurrentPlayer();
+        //     // this.opponent.opponent = this;
+        // }
         this.pieces = new ArrayList<Piece>();
     }
 
-    public void setName(String name) {
+    public void setName(int name) {
         this.name = name;
     }
 
-    public String getName() {
+    public int getName() {
         return this.name;
     }
 

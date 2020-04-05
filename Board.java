@@ -35,6 +35,15 @@ public class Board extends JFrame {
         setdata();
         createScreen();
     }
+    
+    public Board() {
+        // this.playerInTurn = controllerObject.getPlayers().get(0);
+        this.playerOnePieces = new ArrayList<Piece>();
+        this.playerTwoPieces = new ArrayList<Piece>();
+        this.squareBtns = new TileBtn[this.numerOfSquares][this.numerOfSquares];
+        setdata();
+        createScreen();
+    }
 
     public static String askNameView() {
     	return JOptionPane.showInputDialog(new JFrame(), "New Player name");
@@ -77,17 +86,17 @@ public class Board extends JFrame {
         controlsPanel.add(this.winnerLabel);
 
         this.newGameBtn = new JButton("Start Game");
-        this.newGameBtn.setEnabled(false);
+        // this.newGameBtn.setEnabled(false);
         this.newGameBtn.addActionListener(this.controllerObject);
         controlsPanel.add(this.newGameBtn);
         
         this.playerOneBtn = new JButton("Select Player 1");
         this.playerOneBtn.addActionListener(this.controllerObject);
-        controlsPanel.add(this.playerOneBtn);
+        // controlsPanel.add(this.playerOneBtn);
         
         this.playerTwoBtn = new JButton("Select Player 2");
         this.playerTwoBtn.addActionListener(this.controllerObject);
-        controlsPanel.add(this.playerTwoBtn);
+        // controlsPanel.add(this.playerTwoBtn);
         
         this.endGameBtn = new JButton("End Game");
         this.endGameBtn.addActionListener(this.controllerObject);
@@ -215,6 +224,10 @@ public class Board extends JFrame {
         return this.pieceInMove;
     }
     
+    public void setPieceInMove(Piece piece) {
+        this.pieceInMove = piece;
+    }
+    
     public Player getPlayerInTurn() {
         return this.playerInTurn;
     }
@@ -241,9 +254,9 @@ public class Board extends JFrame {
     
     public void putPiece(TileBtn tileBtn) {
         if(this.possibleMoves.contains(tileBtn)) {
-            if(this.pieceInMove.getRow() != tileBtn.getRow() && this.pieceInMove.getColumn() != tileBtn.getColumn()) {
-                this.nextTurn();
-            }
+            // if(this.pieceInMove.getRow() != tileBtn.getRow() && this.pieceInMove.getColumn() != tileBtn.getColumn()) {
+            //     this.nextTurn();
+            // }
             hidePossibleMoves();
 
             if(this.eatMoves.size() > 0 && this.eatMoves.containsKey(tileBtn)) {
@@ -259,7 +272,7 @@ public class Board extends JFrame {
                 this.pieceInMove = null;
                 this.possibleMoves.clear();
                 this.controllerObject.checkWinner();
-                checkIfPlayerCanEat();
+                // checkIfPlayerCanEat();
             }
         }
     }
