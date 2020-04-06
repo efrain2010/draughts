@@ -4,7 +4,7 @@ import java.io.Serializable;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-public class Piece extends JButton implements Serializable {
+public class Piece extends JButton {
 
     /**
      *

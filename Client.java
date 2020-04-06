@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
 public class Client {
 
     private Socket server = null;
@@ -10,8 +11,9 @@ public class Client {
 
     public Client() {
 
+        this.controllerObject = new Controller(this);
+
         connect();
-        this.controllerObject = new Controller(new Model(), this);
 
         try {
             outputStream = new ObjectOutputStream(server.getOutputStream());

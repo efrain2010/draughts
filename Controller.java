@@ -11,22 +11,38 @@ public class Controller implements ActionListener {
     private Board board;
     private ArrayList<Player> players;
     private int connectedPlayer;
-    private Socket socket;
     private Client parent;
+    private Player player;
+    private ArrayList<Piece> playerOnePieces, playerTwoPieces;
 
-    private ObjectOutputStream outputStream;
-
-    public Controller(Model modelObject, Client parent) {
+    public Controller(Client parent) {
         this.parent = parent;
-        this.modelObject = modelObject;
-        this.players = new ArrayList<Player>();
-        startGame();
+        this.board = new Board(this);
+    }
+    
+    public void showGameScreen(int playerNumber) {
+        this.player.setPlayerNumber(playerNumber);
     }
 
-    public Controller(Model modelObject) {
-        this.modelObject = modelObject;
-        this.players = new ArrayList<Player>();
-        startGame();
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+    
+    public void addPlayer(Player player) {
+        // this.player.setPlayerNumber(playerNumber);
+        // try {
+        //     this.parent.getOutputStream().writeObject(new ModelUpdater(player.getName()));
+        // } catch (IOException ex) {
+        //     ex.printStackTrace();
+        // }
+    }
+
+    public Model getModel() {
+        return modelObject;
     }
 
     public Board getBoard() {
@@ -49,13 +65,12 @@ public class Controller implements ActionListener {
         this.connectedPlayer = connectedPlayer;
     }
 
-    public void startGame() {
+    public void startGame(int boardSize) {
         // for(int i = 0; i < this.modelObject.getNumberOfPlayers(); i++) {
         // this.connectedPlayer = new Player(Board.askNameView());
         // this.players.add(connectedPlayer);
         // }
-        this.board = new Board(this);
-        board.setVisible(true);
+        this.board.startGame(boardSize);
     }
 
     @Override
@@ -64,7 +79,7 @@ public class Controller implements ActionListener {
             if (this.board.getPieceInMove() != null) {
                 try {
                     TileBtn btn = (TileBtn) e.getSource();
-                    BoardUpdater boardUp = new BoardUpdater(this.board.getPieceInMove().getRow(), btn.getRow(), this.board.getPieceInMove().getColumn(), btn.getColumn());
+                    ModelUpdater boardUp = new ModelUpdater(this.board.getPieceInMove().getRow(), btn.getRow(), this.board.getPieceInMove().getColumn(), btn.getColumn());
                     this.parent.getOutputStream().writeObject(boardUp);
                 } catch (IOException ex) {
                     ex.printStackTrace();

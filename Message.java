@@ -1,12 +1,18 @@
-import java.io.Serializable;
-public class Message implements Serializable {
-    private String messageText;
-    private String senderName;
-    public Message(String messageText, String senderName) {
-        this.messageText = messageText;
-        this.senderName = senderName;
+
+public class Message {
+
+    private String message;
+
+    public Message(String message) {
+        this.message = message;
     }
-    public String toString() {
-        return this.senderName + ": " + this.messageText;
+
+    public void setMessage(String message) {
+        this.message = message;
     }
+    
+    public String getMessage() {
+        return message;
+    }
+
 }

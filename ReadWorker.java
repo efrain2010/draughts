@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
@@ -23,17 +22,25 @@ public class ReadWorker extends SwingWorker<Void, Void> {
 
     public Void doInBackground() {
         System.out.println("Started read worker");
-        BoardUpdater updater = null;
+        ModelUpdater updater = null;
         try {
-            while ((updater = (BoardUpdater) inputStream.readObject()) != null) {
-                if(!updater.getSendingCoords()) {
-                    System.out.println(updater);
-                    this.parent.getController().setPlayer(updater.getNumOfPlayer());
-                } else {
-                    TileBtn prevTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getPrevRow()][updater.getPrevColumn()];
-                    TileBtn nextTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getNewRow()][updater.getNewColumn()];
-                    this.parent.getController().movePiece(prevTileBtn, nextTileBtn);
-                    // this.parent.getController().getBoard().movePieceByCoords(updater.getPrevRow(),updater.getPrevColumn());
+            while ((updater = (ModelUpdater) inputStream.readObject()) != null) {
+                System.out.println(updater.getGameState());
+                if(updater.getGameState() == 0) {
+                    this.parent.getController().showGameScreen(updater.getNumOfPlayer());
+                } else if(updater.getGameState() == 1) {
+                    System.out.println("Starting Game");
+                    this.parent.getController().startGame(updater.getBoardSize());
+                } else if(updater.getGameState() == 2) { 
+                    if(!updater.getSendingCoords()) {
+                        System.out.println(updater);
+                        this.parent.getController().setPlayer(updater.getNumOfPlayer());
+                    } else {
+                        TileBtn prevTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getPrevRow()][updater.getPrevColumn()];
+                        TileBtn nextTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getNewRow()][updater.getNewColumn()];
+                        this.parent.getController().movePiece(prevTileBtn, nextTileBtn);
+                        // this.parent.getController().getBoard().movePieceByCoords(updater.getPrevRow(),updater.getPrevColumn());
+                    }
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -44,19 +51,5 @@ public class ReadWorker extends SwingWorker<Void, Void> {
             return null;
         }
     }
-
-    // protected void done() {
-    //     synchronized (this.socket) {
-    //         try {
-    //             this.socket.wait();
-    //             System.out.println(this.getState());
-    //             System.out.println(this.toString());
-    //             this.wait();
-    //         } catch (InterruptedException e) {
-    //             // TODO Auto-generated catch block
-    //             e.printStackTrace();
-    //         }
-    //     }
-    // }
 
 }

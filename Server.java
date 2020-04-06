@@ -8,13 +8,10 @@ public class Server implements Runnable{
     
     private ServerSocket server;
     private ArrayList<ClientRunner> clients = new ArrayList<ClientRunner>();
-    private Game gameObject;
-    protected Thread runningThread;
-    protected boolean isStopped = false;
-    private ArrayList<Player> players = new ArrayList<Player>(); 
+    private Model modelObject;
     
     public Server() {
-        this.gameObject = new Game();
+        this.modelObject = new Model();
         try {
             server = new ServerSocket(8765);
         }catch(IOException e) {
@@ -23,47 +20,38 @@ public class Server implements Runnable{
     }
 
     public void run() {
-        synchronized(this){
-            this.runningThread = Thread.currentThread();
-        }
-        while(!this.isStopped()) {
+        while(true) {
             Socket clientSocket = null;
             try {
-                
-                if(clients.size() < 2) {
+                if(this.clients.size() < this.modelObject.getNumberOfPlayers()) {
                     clientSocket = server.accept();
                     System.out.println("New client connected");
-                    int playerNum = clients.size()+1;
-                    ClientRunner client = new ClientRunner(clientSocket,this, playerNum);
-                    clients.add(client);
-                    Thread r = new Thread(client, ""+playerNum);
-                    r.start();
-                    this.transmit(new BoardUpdater(playerNum));
+                    int playerNumber = this.clients.size()+1;
+                    ClientRunner client = new ClientRunner(clientSocket, this);
+                    this.clients.add(client);
+                    Thread t = new Thread(client, ""+playerNumber);
+                    t.start();
+                    createPlayer(client, playerNumber);
                 }
             }catch(IOException e) {
-                if(isStopped()) {
-                    System.out.println("Server Stopped.") ;
-                    return;
-                }
                 e.printStackTrace();
             }
         }
     }
 
-    private synchronized boolean isStopped() {
-        return this.isStopped;
-    }
-
-    public synchronized void stop(){
-        this.isStopped = true;
-        try {
-            this.server.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Error closing server", e);
+    private void createPlayer(ClientRunner client, int playerNum) {
+        ModelUpdater modelUpdater = new ModelUpdater(playerNum);
+        this.modelObject.addPlayer(new Player(playerNum));
+        client.transmitMessage(modelUpdater);
+        if(this.clients.size() == this.modelObject.getNumberOfPlayers()) {
+            this.modelObject.setGameState(1);
+            modelUpdater.setGameState(1);
+            modelUpdater.setBoardSize(this.modelObject.getBoardSize());
+            transmit(modelUpdater); 
         }
     }
     
-    public void transmit(BoardUpdater updater) {
+    public void transmit(ModelUpdater updater) {
         for(ClientRunner c: clients) {
             if(c != null) {
                 c.transmitMessage(updater);
@@ -72,7 +60,6 @@ public class Server implements Runnable{
     }
     
     public static void main(String[] args) {
-
         Thread t = new Thread(new Server());
         t.start();
         try {
