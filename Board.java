@@ -2,7 +2,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import java.awt.*;
 
@@ -24,7 +24,6 @@ public class Board extends JFrame {
     private ArrayList<TileBtn> possibleMoves, clickableBtns;
     private HashMap<TileBtn, TileBtn> eatMoves;
     private String movementColor = "#add8e6";
-    private String playerName;
     private int boardSize = 8;
     
     public Board(Controller controllerObject) {
@@ -38,20 +37,27 @@ public class Board extends JFrame {
         // this.controllerObject.s
         setdata();
         createScreen();
-        createBoard();
     }
-
+    
     public void startGame(int boardSize) {
-        this.boardSize = boardSize;
-        this.initPanel.setVisible(false);
-        this.masterPanel.remove(this.initPanel);
-        this.masterPanel.add(this.boardPanel);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                initPanel.setVisible(false);
+                masterPanel.remove(initPanel);
+                createBoard();
+                setPlayers();
+            }
+        });
     }
 
     private void setdata() {
         this.possibleMoves = new ArrayList<TileBtn>();
         this.clickableBtns = new ArrayList<TileBtn>();
         this.eatMoves = new HashMap<TileBtn, TileBtn>();
+    }
+
+    public Piece getBoardPiece(int row, int column) {
+        return this.squareBtns[row][column].getBoardPiece();
     }
 
     public void setPlayer(int num, Player player) {
@@ -101,7 +107,7 @@ public class Board extends JFrame {
         // this.playerTwoBtn.addActionListener(this.controllerObject);
         // controlsPanel.add(this.playerTwoBtn);
         
-        // this.endGameBtn = new JButton("End Game");
+        // this.endGameMidBtn = new JButton("End Game");
         // this.endGameBtn.addActionListener(this.controllerObject);
         // this.endGameBtn.setVisible(false);
         // controlsPanel.add(this.endGameBtn);
@@ -110,6 +116,7 @@ public class Board extends JFrame {
         this.boardPanel.setSize(520, 520);
         this.boardPanel.setLayout(new GridLayout(this.boardSize, this.boardSize, 0, 0));
         this.boardPanel.setLayout(new GridLayout(8, 8, 0, 0));
+        // this.boardPanel.setVisible(false);
         this.masterPanel.add(this.boardPanel, BorderLayout.WEST);
         // this.masterPanel.add(controlsPanel, BorderLayout.EAST);
         this.masterPanel.add(this.initPanel);
@@ -138,6 +145,7 @@ public class Board extends JFrame {
                 this.squareBtns[i][j].addActionListener(this.controllerObject);
             }
         }
+        this.masterPanel.add(boardPanel);
     }
 
     public void setPlayers() {
@@ -145,16 +153,20 @@ public class Board extends JFrame {
             for (int j = 0; j < this.squareBtns[i].length; j++) {
                 if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)) {
                     Piece piece = new Piece(i, j, false);
-                    if(i < this.controllerObject.getModel().getBoardSize()/2-1) {
-                        piece.setColor("red"); 
-                        // piece.setPlayer(this.playerOne);
-                        // this.playerOnePieces.add(piece);
+                    if(i < this.boardSize/2-1) {
+                        piece.setColor("red");
+                        if(this.controllerObject.getPlayer().getPlayerNumber() == 2) {
+                            piece.setPlayer(this.controllerObject.getPlayer());
+                            this.controllerObject.getPlayer().addPiece(piece);
+                        }
                         this.squareBtns[i][j].setBoardPiece(piece);
                         this.squareBtns[i][j].setIcon(new ImageIcon(piece.getImage()));
-                    } else if(i > this.controllerObject.getModel().getBoardSize()/2) {
-                        piece.setColor("white"); 
-                        // piece.setPlayer(this.playerTwo);
-                        // this.playerTwoPieces.add(piece);
+                    } else if(i > this.boardSize/2) {
+                        piece.setColor("white");
+                        if(this.controllerObject.getPlayer().getPlayerNumber() == 1) {
+                            piece.setPlayer(this.controllerObject.getPlayer());
+                            this.controllerObject.getPlayer().addPiece(piece);
+                        }
                         this.squareBtns[i][j].setBoardPiece(piece);
                         this.squareBtns[i][j].setIcon(new ImageIcon(piece.getImage()));
                     }
@@ -172,11 +184,6 @@ public class Board extends JFrame {
         setPlayers();
         // this.winnerLabel.setText(this.playerInTurn.getName()+"'s turn");
         // this.winnerLabel.setVisible(true);
-    }
-
-    public void movePiece(TileBtn prevTileBtn, TileBtn nextTileBtn) {
-        this.takePiece(prevTileBtn);
-        this.putPiece(nextTileBtn);
     }
     
     public void endGame() {
@@ -235,39 +242,48 @@ public class Board extends JFrame {
         // this.winnerLabel.setVisible(true);
     }
 
-    public void takePiece(TileBtn tileBtn) {
-        // if(tileBtn.getBoardPiece().getPlayer() == this.playerInTurn) {
-        //     if(this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()].getBoardPiece() != null) {
-        //         this.pieceInMove = tileBtn.getBoardPiece();
-        //         checkPossibleMoves();
-        //         this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()].removeBoardPiece();
-        //     }
+    public void movePiece(int prevRow, int prevColumn, int newRow, int newColumn) {
+        // if(this.pieceInMove == null) {
+            System.out.println(" px: " + prevRow + " py: " + prevColumn + " nx: " + newRow + " ny: " + newColumn);
+            takePiece(prevRow, prevColumn);
+        // } else {
+            putPiece(newRow, newColumn);
+            // this.squareBtns[row][column].setBoardPiece(this.pieceInMove);
+            // this.squareBtns[row][column].setIcon(new ImageIcon(this.pieceInMove.getImage()));
+            // this.pieceInMove = null;
         // }
     }
+
+    public void takePiece(int row, int column) {
+        this.pieceInMove = this.squareBtns[row][column].getBoardPiece();
+        // checkPossibleMoves();
+        this.squareBtns[row][column].removeBoardPiece();
+    }
     
-    public void putPiece(TileBtn tileBtn) {
-        if(this.possibleMoves.contains(tileBtn)) {
+    public void putPiece(int row, int column) {
+        // if(this.possibleMoves.contains(tileBtn)) {
             // if(this.pieceInMove.getRow() != tileBtn.getRow() && this.pieceInMove.getColumn() != tileBtn.getColumn()) {
             //     this.nextTurn();
             // }
-            hidePossibleMoves();
+            // hidePossibleMoves();
 
-            if(this.eatMoves.size() > 0 && this.eatMoves.containsKey(tileBtn)) {
-                checkIfAte(tileBtn);
-            }
+            // if(this.eatMoves.size() > 0 && this.eatMoves.containsKey(tileBtn)) {
+            //     checkIfAte(tileBtn);
+            // }
 
-            if(this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()].getBoardPiece() == null) {
-                this.pieceInMove.setRow(tileBtn.getRow());
-                this.pieceInMove.setColumn(tileBtn.getColumn());
-                this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()].setIcon(new ImageIcon(this.pieceInMove.getImage()));
-                this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()].setBoardPiece(this.pieceInMove);
-                checkIfCrowned(this.squareBtns[tileBtn.getRow()][tileBtn.getColumn()]);
+            if(this.squareBtns[row][column].getBoardPiece() == null) {
+                this.pieceInMove.setRow(row);
+                this.pieceInMove.setColumn(column);
+                this.squareBtns[row][column].setIcon(new ImageIcon(this.pieceInMove.getImage()));
+                this.squareBtns[row][column].setBoardPiece(this.pieceInMove);
+                // checkIfCrowned(this.squareBtns[row][column]);
                 this.pieceInMove = null;
-                this.possibleMoves.clear();
-                this.controllerObject.checkWinner();
+                // this.possibleMoves.clear();
+                // this.controllerObject.checkWinner();
                 // checkIfPlayerCanEat();
+                this.controllerObject.changeTurn();
             }
-        }
+        // }
     }
 
     public void showWinner(Player player) {

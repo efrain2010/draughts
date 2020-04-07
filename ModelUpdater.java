@@ -2,6 +2,8 @@ import java.io.Serializable;
 
 public class ModelUpdater implements Serializable {
 
+    private int row;
+    private int column;
     private int prevRow;
     private int newRow;
     private int prevColumn;
@@ -13,11 +15,18 @@ public class ModelUpdater implements Serializable {
     private Player player;
     private int boardSize;
 
-    public ModelUpdater(int prevRow, int newRow, int prevColumn, int newColumn) {
+    public ModelUpdater(int prevRow, int prevColumn, int newRow, int newColumn) {
         this.prevRow = prevRow;
         this.newRow = newRow;
         this.prevColumn = prevColumn;
         this.newColumn = newColumn;
+        this.sendingCoords = true;
+        this.gameState = 1;
+    }
+    
+    public ModelUpdater(int row, int column) {
+        this.row = row;
+        this.column = column;
         this.sendingCoords = true;
         this.gameState = 1;
     }
@@ -29,6 +38,14 @@ public class ModelUpdater implements Serializable {
     public ModelUpdater(String playerName) {
         this.playerName = playerName;
         this.gameState = 0;
+    }
+
+    public int getRow() {
+        return row;
+    }
+    
+    public int getColumn() {
+        return column;
     }
 
     public int getPrevRow() {

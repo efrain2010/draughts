@@ -47,7 +47,7 @@ public class Server implements Runnable{
             this.modelObject.setGameState(1);
             modelUpdater.setGameState(1);
             modelUpdater.setBoardSize(this.modelObject.getBoardSize());
-            transmit(modelUpdater); 
+            transmit(modelUpdater);
         }
     }
     

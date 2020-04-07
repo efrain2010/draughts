@@ -11,20 +11,26 @@ public class Client {
 
     public Client() {
 
-        this.controllerObject = new Controller(this);
-
+        
         connect();
+        
+        if (this.server != null) {
 
-        try {
-            outputStream = new ObjectOutputStream(server.getOutputStream());
-        }catch(IOException e) {
-            e.printStackTrace();
+            this.controllerObject = new Controller(this);
+            
+            try {
+                outputStream = new ObjectOutputStream(server.getOutputStream());
+            }catch(IOException e) {
+                e.printStackTrace();
+            }
+            
+            ReadWorker rw = new ReadWorker(server,this);
+            rw.execute();
+            
+            System.out.println("HERE");
+        } else {
+            System.out.println("Server is not running");
         }
-
-        ReadWorker rw = new ReadWorker(server,this);
-        rw.execute();
-
-        System.out.println("HERE");
     }
 
     public Controller getController() {

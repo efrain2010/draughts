@@ -1,8 +1,6 @@
 
 import java.awt.event.*;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 
 public class Controller implements ActionListener {
@@ -13,11 +11,12 @@ public class Controller implements ActionListener {
     private int connectedPlayer;
     private Client parent;
     private Player player;
-    private ArrayList<Piece> playerOnePieces, playerTwoPieces;
-
+    private int playerInTurn;
+    
     public Controller(Client parent) {
         this.parent = parent;
         this.board = new Board(this);
+        this.playerInTurn = 1;
     }
     
     public void showGameScreen(int playerNumber) {
@@ -73,21 +72,49 @@ public class Controller implements ActionListener {
         this.board.startGame(boardSize);
     }
 
+    public void movePiece(int prevRow, int prevColumn, int newRow, int newColumn) {
+        System.out.println("moving the piece");
+        this.board.movePiece(prevRow, prevColumn, newRow, newColumn);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TileBtn) {
-            if (this.board.getPieceInMove() != null) {
-                try {
+            // if (this.board.getPieceInMove() != null) {
+            //     try {
+            //         TileBtn btn = (TileBtn) e.getSource();
+            //         ModelUpdater boardUp = new ModelUpdater(btn.getRow(), btn.getColumn());
+            //         boardUp.setGameState(2);
+            //         this.parent.getOutputStream().writeObject(boardUp);
+            //     } catch (IOException ex) {
+            //         ex.printStackTrace();
+            //     }
+            // } else {
+                if(this.playerInTurn == this.player.getPlayerNumber()) {
                     TileBtn btn = (TileBtn) e.getSource();
-                    ModelUpdater boardUp = new ModelUpdater(this.board.getPieceInMove().getRow(), btn.getRow(), this.board.getPieceInMove().getColumn(), btn.getColumn());
-                    this.parent.getOutputStream().writeObject(boardUp);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                    if(this.board.getPieceInMove() == null) {
+                        if(btn.getBoardPiece() != null) {
+                            if(btn.getBoardPiece().getPlayer() != null) {
+                                System.out.println("Taking the piece");
+                                System.out.println("x: " + btn.getBoardPiece().getRow() + " y: " + btn.getBoardPiece().getColumn());
+                                this.board.setPieceInMove(btn.getBoardPiece());
+                            }
+                        }
+                    } else {
+                        System.out.println("Taking the piece");
+                        ModelUpdater boardUp = new ModelUpdater(this.board.getPieceInMove().getRow(), this.board.getPieceInMove().getColumn(), btn.getRow(), btn.getColumn());
+                        boardUp.setGameState(2);
+                        this.board.setPieceInMove(null);
+                        try {
+                            this.parent.getOutputStream().writeObject(boardUp);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                } else {
+                    System.out.println("Is not your turn");
                 }
-            } else {
-                TileBtn btn = (TileBtn) e.getSource();
-                this.getBoard().setPieceInMove(btn.getBoardPiece());
-            }
+            // }
         } else {
             if(e.getSource() == this.board.getPlayerOneBtn()) {
                 // this.connectedPlayer.setPlayerNumber(1);
@@ -106,10 +133,10 @@ public class Controller implements ActionListener {
         }
     }
 
-    public void movePiece(TileBtn prevBtn, TileBtn newBtn) {
-        this.board.takePiece(prevBtn);
-        this.board.putPiece(newBtn);
-    }
+    // public void movePiece(TileBtn prevBtn, TileBtn newBtn) {
+    //     this.board.takePiece(prevBtn);
+    //     this.board.putPiece(newBtn);
+    // }
 
     public void showCoords(int[] coords) {
         System.out.println(coords[0]);
@@ -121,6 +148,14 @@ public class Controller implements ActionListener {
         // } else if (this.board.getPlayerTwo().getPieces().size() <= 0) {
         //     this.board.showWinner(this.board.getPlayerOne());
         // }
+    }
+
+    public void changeTurn() {
+        if(this.playerInTurn == 1) {
+            this.playerInTurn = 2;
+        } else {
+            this.playerInTurn = 1;
+        }
     }
 
 }

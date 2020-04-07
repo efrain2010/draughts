@@ -26,7 +26,6 @@ public class ClientRunner implements Runnable {
         try {
             ModelUpdater updater = null;
             while((updater = (ModelUpdater)inputStream.readObject())!= null) {
-                System.out.println(updater);
                 this.parent.transmit(updater);
             }
             inputStream.close();
