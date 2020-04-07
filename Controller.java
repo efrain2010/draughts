@@ -23,6 +23,10 @@ public class Controller implements ActionListener {
         this.player.setPlayerNumber(playerNumber);
     }
 
+    public int getPlayerInTurn() {
+        return playerInTurn;
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -31,15 +35,6 @@ public class Controller implements ActionListener {
         this.player = player;
     }
     
-    public void addPlayer(Player player) {
-        // this.player.setPlayerNumber(playerNumber);
-        // try {
-        //     this.parent.getOutputStream().writeObject(new ModelUpdater(player.getName()));
-        // } catch (IOException ex) {
-        //     ex.printStackTrace();
-        // }
-    }
-
     public Model getModel() {
         return modelObject;
     }
@@ -65,43 +60,27 @@ public class Controller implements ActionListener {
     }
 
     public void startGame(int boardSize) {
-        // for(int i = 0; i < this.modelObject.getNumberOfPlayers(); i++) {
-        // this.connectedPlayer = new Player(Board.askNameView());
-        // this.players.add(connectedPlayer);
-        // }
         this.board.startGame(boardSize);
     }
 
     public void movePiece(int prevRow, int prevColumn, int newRow, int newColumn) {
-        System.out.println("moving the piece");
         this.board.movePiece(prevRow, prevColumn, newRow, newColumn);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TileBtn) {
-            // if (this.board.getPieceInMove() != null) {
-            //     try {
-            //         TileBtn btn = (TileBtn) e.getSource();
-            //         ModelUpdater boardUp = new ModelUpdater(btn.getRow(), btn.getColumn());
-            //         boardUp.setGameState(2);
-            //         this.parent.getOutputStream().writeObject(boardUp);
-            //     } catch (IOException ex) {
-            //         ex.printStackTrace();
-            //     }
-            // } else {
-                if(this.playerInTurn == this.player.getPlayerNumber()) {
-                    TileBtn btn = (TileBtn) e.getSource();
-                    if(this.board.getPieceInMove() == null) {
-                        if(btn.getBoardPiece() != null) {
-                            if(btn.getBoardPiece().getPlayer() != null) {
-                                System.out.println("Taking the piece");
-                                System.out.println("x: " + btn.getBoardPiece().getRow() + " y: " + btn.getBoardPiece().getColumn());
-                                this.board.setPieceInMove(btn.getBoardPiece());
-                            }
+            if(this.playerInTurn == this.player.getPlayerNumber()) {
+                TileBtn btn = (TileBtn) e.getSource();
+                if(this.board.getPieceInMove() == null) {
+                    if(btn.getBoardPiece() != null) {
+                        if(btn.getBoardPiece().getPlayer() != null) {
+                            this.board.setPieceInMove(btn.getBoardPiece());
+                            this.board.checkPossibleMoves();
                         }
-                    } else {
-                        System.out.println("Taking the piece");
+                    }
+                } else {
+                    if(this.board.getPossibleMoves().contains(btn)) {
                         ModelUpdater boardUp = new ModelUpdater(this.board.getPieceInMove().getRow(), this.board.getPieceInMove().getColumn(), btn.getRow(), btn.getColumn());
                         boardUp.setGameState(2);
                         this.board.setPieceInMove(null);
@@ -111,18 +90,12 @@ public class Controller implements ActionListener {
                             ex.printStackTrace();
                         }
                     }
-                } else {
-                    System.out.println("Is not your turn");
                 }
-            // }
+            } else {
+                System.out.println("Is not your turn");
+            }
         } else {
-            if(e.getSource() == this.board.getPlayerOneBtn()) {
-                // this.connectedPlayer.setPlayerNumber(1);
-                // this.board.setPlayer(1, this.connectedPlayer);
-            } else if(e.getSource() == this.board.getPlayerTwoBtn()) {
-                // this.connectedPlayer.setPlayerNumber(2);
-                // this.board.setPlayer(2, this.connectedPlayer);
-            } else if(e.getSource() == this.board.getNewGameBtn()) {
+            if(e.getSource() == this.board.getNewGameBtn()) {
                 System.out.println(this.connectedPlayer);
                 System.out.println("NEW GAME!!!");
                 this.board.setNewGame();
@@ -132,11 +105,6 @@ public class Controller implements ActionListener {
             }
         }
     }
-
-    // public void movePiece(TileBtn prevBtn, TileBtn newBtn) {
-    //     this.board.takePiece(prevBtn);
-    //     this.board.putPiece(newBtn);
-    // }
 
     public void showCoords(int[] coords) {
         System.out.println(coords[0]);
@@ -156,6 +124,14 @@ public class Controller implements ActionListener {
         } else {
             this.playerInTurn = 1;
         }
+
+        if(this.itIsMyTurn()) {
+            this.board.checkIfPlayerCanEat();
+        }
+    }
+
+    public boolean itIsMyTurn() {
+        return this.player.getPlayerNumber() == this.playerInTurn;
     }
 
 }

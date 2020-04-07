@@ -17,7 +17,7 @@ public class Board extends JFrame {
     private Controller controllerObject;
 
     private TileBtn[][] squareBtns;
-    private JPanel masterPanel, boardPanel, initPanel;
+    private JPanel masterPanel, boardPanel, initPanel, controlsPanel;
     private Piece pieceInMove;
     private JButton newGameBtn, endGameBtn, playerOneBtn, playerTwoBtn;
     private JLabel winnerLabel, statusLabel;
@@ -28,13 +28,10 @@ public class Board extends JFrame {
     
     public Board(Controller controllerObject) {
         this.controllerObject = controllerObject;
-        // this.playerInTurn = controllerObject.getPlayers().get(0);
-        // this.playerOnePieces = new ArrayList<Piece>();
-        // this.playerTwoPieces = new ArrayList<Piece>();
         this.squareBtns = new TileBtn[this.boardSize][this.boardSize];
 
         this.controllerObject.setPlayer(new Player(JOptionPane.showInputDialog(new JFrame(), "New Player name")));
-        // this.controllerObject.s
+
         setdata();
         createScreen();
     }
@@ -43,7 +40,11 @@ public class Board extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 initPanel.setVisible(false);
+                boardPanel.setVisible(true);
                 masterPanel.remove(initPanel);
+                masterPanel.add(boardPanel);
+                // masterPanel.add(controlsPanel, BorderLayout.SOUTH);
+                // masterPanel.add(boardPanel, BorderLayout.CENTER);
                 createBoard();
                 setPlayers();
             }
@@ -61,13 +62,6 @@ public class Board extends JFrame {
     }
 
     public void setPlayer(int num, Player player) {
-        // if(num == 1) {
-        //     this.playerOne = player;
-        //     this.playerOne.setStakes(this.playerOnePieces);
-        // } else {
-        //     this.playerTwo = player;
-        //     this.playerTwo.setStakes(this.playerTwoPieces);
-        // }
         this.newGameBtn.setEnabled(true);
     }
 
@@ -79,47 +73,26 @@ public class Board extends JFrame {
         
         this.masterPanel = new JPanel();
         this.masterPanel.setSize(520, 520);
+        // this.masterPanel.setLayout(new BorderLayout());
         this.masterPanel.setLayout(new BoxLayout(this.masterPanel, BoxLayout.Y_AXIS));
-
+        
         this.initPanel = new JPanel();
         this.initPanel.setLayout(new BorderLayout());
-        // JPanel controlsPanel = new JPanel();
-        // // controlsPanel.setSize(520, 30);
-        // controlsPanel.setPreferredSize(new Dimension(520, 30));
-        // controlsPanel.setBackground(Color.decode("#75777b"));
-        // controlsPanel.setLayout(new FlowLayout());
-
-        // this.winnerLabel = new JLabel();
-        // controlsPanel.add(this.winnerLabel);
-        
-        this.initPanel = new JPanel();
         this.initPanel.setSize(520,520);
         this.statusLabel = new JLabel("<html><body style='text-align:center;'>Hello " + this.controllerObject.getPlayer().getName() + "<br>we need a second player...</body></html>");
-        // this.newGameBtn.addActionListener(this.controllerObject);
-        
         this.initPanel.add(this.statusLabel, BorderLayout.CENTER);
         
-        // this.playerOneBtn = new JButton("Select Player 1");
-        // this.playerOneBtn.addActionListener(this.controllerObject);
-        // // controlsPanel.add(this.playerOneBtn);
-        
-        // this.playerTwoBtn = new JButton("Select Player 2");
-        // this.playerTwoBtn.addActionListener(this.controllerObject);
-        // controlsPanel.add(this.playerTwoBtn);
-        
-        // this.endGameMidBtn = new JButton("End Game");
-        // this.endGameBtn.addActionListener(this.controllerObject);
-        // this.endGameBtn.setVisible(false);
-        // controlsPanel.add(this.endGameBtn);
+        this.newGameBtn = new JButton("Start Again");
+        this.newGameBtn.addActionListener(this.controllerObject);
+        this.newGameBtn.setVisible(false);        
 
         this.boardPanel = new JPanel();
+        this.boardPanel.setVisible(false);
         this.boardPanel.setSize(520, 520);
         this.boardPanel.setLayout(new GridLayout(this.boardSize, this.boardSize, 0, 0));
-        this.boardPanel.setLayout(new GridLayout(8, 8, 0, 0));
-        // this.boardPanel.setVisible(false);
-        this.masterPanel.add(this.boardPanel, BorderLayout.WEST);
-        // this.masterPanel.add(controlsPanel, BorderLayout.EAST);
+        
         this.masterPanel.add(this.initPanel);
+        this.masterPanel.add(this.boardPanel);
         this.add(this.masterPanel);
 
         this.setVisible(true);
@@ -145,7 +118,6 @@ public class Board extends JFrame {
                 this.squareBtns[i][j].addActionListener(this.controllerObject);
             }
         }
-        this.masterPanel.add(boardPanel);
     }
 
     public void setPlayers() {
@@ -228,65 +200,62 @@ public class Board extends JFrame {
         return this.pieceInMove;
     }
     
+    public ArrayList<TileBtn> getPossibleMoves() {
+        return possibleMoves;
+    }
+    
     public void setPieceInMove(Piece piece) {
         this.pieceInMove = piece;
     }
 
-    public void nextTurn() {
-        // if(this.controllerObject.getPlayerInTurn() == this.playerOne) {
-        //     this.playerInTurn = this.playerTwo;
-        // } else {
-        //     this.playerInTurn = this.playerOne;
-        // }
-        // this.winnerLabel.setText(this.playerInTurn.getName() + "'s turn");
-        // this.winnerLabel.setVisible(true);
-    }
-
     public void movePiece(int prevRow, int prevColumn, int newRow, int newColumn) {
-        // if(this.pieceInMove == null) {
-            System.out.println(" px: " + prevRow + " py: " + prevColumn + " nx: " + newRow + " ny: " + newColumn);
-            takePiece(prevRow, prevColumn);
-        // } else {
-            putPiece(newRow, newColumn);
-            // this.squareBtns[row][column].setBoardPiece(this.pieceInMove);
-            // this.squareBtns[row][column].setIcon(new ImageIcon(this.pieceInMove.getImage()));
-            // this.pieceInMove = null;
-        // }
+        takePiece(prevRow, prevColumn);
+        putPiece(newRow, newColumn);
     }
 
     public void takePiece(int row, int column) {
         this.pieceInMove = this.squareBtns[row][column].getBoardPiece();
-        // checkPossibleMoves();
         this.squareBtns[row][column].removeBoardPiece();
     }
     
     public void putPiece(int row, int column) {
-        // if(this.possibleMoves.contains(tileBtn)) {
-            // if(this.pieceInMove.getRow() != tileBtn.getRow() && this.pieceInMove.getColumn() != tileBtn.getColumn()) {
-            //     this.nextTurn();
-            // }
-            // hidePossibleMoves();
 
-            // if(this.eatMoves.size() > 0 && this.eatMoves.containsKey(tileBtn)) {
-            //     checkIfAte(tileBtn);
-            // }
+        TileBtn tileBtn = this.squareBtns[row][column];
 
-            if(this.squareBtns[row][column].getBoardPiece() == null) {
-                this.pieceInMove.setRow(row);
-                this.pieceInMove.setColumn(column);
-                this.squareBtns[row][column].setIcon(new ImageIcon(this.pieceInMove.getImage()));
-                this.squareBtns[row][column].setBoardPiece(this.pieceInMove);
-                // checkIfCrowned(this.squareBtns[row][column]);
-                this.pieceInMove = null;
-                // this.possibleMoves.clear();
-                // this.controllerObject.checkWinner();
-                // checkIfPlayerCanEat();
-                this.controllerObject.changeTurn();
-            }
-        // }
+        if(this.controllerObject.itIsMyTurn()) {
+            hidePossibleMoves();
+        }
+
+        checkIfAte(tileBtn);
+        
+        if(tileBtn.getBoardPiece() == null) {
+            this.pieceInMove.setRow(row);
+            this.pieceInMove.setColumn(column);
+            tileBtn.setIcon(new ImageIcon(this.pieceInMove.getImage()));
+            tileBtn.setBoardPiece(this.pieceInMove);
+            checkIfCrowned(tileBtn);
+            this.pieceInMove = null;
+            this.possibleMoves.clear();
+            this.controllerObject.checkWinner();
+            this.controllerObject.changeTurn();
+        }
     }
 
     public void showWinner(Player player) {
+        // this.winnerLabel.setText("PLAYER " + player.getName() + " WON!!!");
+        // for(TileBtn btn : this.clickableBtns) {
+        //     btn.setEnabled(false);
+        // }
+    }
+    
+    public void checkIfLose(int piecesLeft) {
+        if(piecesLeft == 11) {
+            if(this.controllerObject.itIsMyTurn()) {
+                System.out.println("I Lose");
+            } else {
+                System.out.println("I Won");
+            }
+        }
         // this.winnerLabel.setText("PLAYER " + player.getName() + " WON!!!");
         // for(TileBtn btn : this.clickableBtns) {
         //     btn.setEnabled(false);
@@ -299,18 +268,15 @@ public class Board extends JFrame {
                 btn.crownPiece();
             }
         } else {
-            // if(btn.getBoardPiece().getRow() == this.numerOfSquares-1) {
-            //     btn.crownPiece();
-            // }
+            if(btn.getBoardPiece().getRow() == this.boardSize-1) {
+                btn.crownPiece();
+            }
         }
     }
 
-    private void checkPossibleMoves() {
-        System.out.println();
+    public void checkPossibleMoves() {
         this.squareBtns[this.pieceInMove.getRow()][this.pieceInMove.getColumn()].setBackground(Color.decode("#add8e6"));
         this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()][this.pieceInMove.getColumn()]);
-        System.out.println(this.pieceInMove.getRow());
-        System.out.println(this.pieceInMove.getColumn());
         if(this.pieceInMove.isPlayerOne()) {
             checkMoveQuadrant1();
             checkMoveQuadrant2();
@@ -335,22 +301,22 @@ public class Board extends JFrame {
     }
 
     private void checkMoveQuadrant1() {
-        // if(this.pieceInMove.getRow()-1 >= 0  && this.pieceInMove.getColumn()+1 < this.numerOfSquares) {
-        //     if(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
-        //         this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].setBackground(Color.decode(movementColor));
-        //         this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
-        //     } else {
-        //         if(this.pieceInMove.getRow()-2 >= 0 && this.pieceInMove.getColumn()+2 < this.numerOfSquares) {
-        //             if(!this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-        //                 if(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
-        //                     this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].setBackground(Color.decode(movementColor));
-        //                     this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2]);
-        //                     this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(this.pieceInMove.getRow()-1 >= 0  && this.pieceInMove.getColumn()+1 < this.boardSize) {
+            if(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
+                this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].setBackground(Color.decode(movementColor));
+                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
+            } else {
+                if(this.pieceInMove.getRow()-2 >= 0 && this.pieceInMove.getColumn()+2 < this.boardSize) {
+                    if(!this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
+                        if(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
+                            this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].setBackground(Color.decode(movementColor));
+                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2]);
+                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkMoveQuadrant2() {
@@ -373,132 +339,156 @@ public class Board extends JFrame {
     }
     
     private void checkMoveQuadrant3() {
-        // if(this.pieceInMove.getRow()+1 < this.numerOfSquares && this.pieceInMove.getColumn()-1 >= 0) {
-        //     if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece() == null) {
-        //         this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].setBackground(Color.decode(movementColor));
-        //         this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
-        //     } else {
-        //         if(this.pieceInMove.getRow()+2 < this.numerOfSquares && this.pieceInMove.getColumn()-2 >= 0) {
-        //             if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-        //                 if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].getBoardPiece() == null) {
-        //                     this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].setBackground(Color.decode(movementColor));
-        //                     this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2]);
-        //                     this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(this.pieceInMove.getRow()+1 < this.boardSize && this.pieceInMove.getColumn()-1 >= 0) {
+            if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece() == null) {
+                this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].setBackground(Color.decode(movementColor));
+                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
+            } else {
+                if(this.pieceInMove.getRow()+2 < this.boardSize && this.pieceInMove.getColumn()-2 >= 0) {
+                    if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
+                        if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].getBoardPiece() == null) {
+                            this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].setBackground(Color.decode(movementColor));
+                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2]);
+                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private void checkMoveQuadrant4() {
-        // if(this.pieceInMove.getRow()+1 < this.numerOfSquares && this.pieceInMove.getColumn()+1 < this.numerOfSquares) {
-        //     if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
-        //         this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].setBackground(Color.decode("#add8e6"));
-        //         this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
-        //     } else {
-        //         if(this.pieceInMove.getRow()+2 < this.numerOfSquares && this.pieceInMove.getColumn()+2 < this.numerOfSquares) {
-        //             if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-        //                 if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
-        //                     this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].setBackground(Color.decode("#add8e6"));
-        //                     this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2]);
-        //                     this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(this.pieceInMove.getRow()+1 < this.boardSize && this.pieceInMove.getColumn()+1 < this.boardSize) {
+            if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
+                this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].setBackground(Color.decode("#add8e6"));
+                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
+            } else {
+                if(this.pieceInMove.getRow()+2 < this.boardSize && this.pieceInMove.getColumn()+2 < this.boardSize) {
+                    if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
+                        if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
+                            this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].setBackground(Color.decode("#add8e6"));
+                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2]);
+                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkIfAte(TileBtn tileBtn) {
-        TileBtn ateTile = this.eatMoves.get(tileBtn);
-        // if(ateTile.getBoardPiece().getPlayer().getPlayerNumber() == 1) {
-        //     this.playerOne.removeStake(ateTile.getBoardPiece());
-        // } else {
-        //     this.playerTwo.removeStake(ateTile.getBoardPiece());
-        // }
-        this.squareBtns[ateTile.getRow()][ateTile.getColumn()].removeBoardPiece();
-        this.eatMoves.clear();
+
+        int row = -1, column = -1;
+        if(this.pieceInMove.getRow() < tileBtn.getRow()) {
+            if(tileBtn.getRow() - this.pieceInMove.getRow() == 2) {
+                row = (tileBtn.getRow() + this.pieceInMove.getRow())/2;
+            }
+        } else {
+            if(this.pieceInMove.getRow() - tileBtn.getRow() == 2) {
+                row = (tileBtn.getRow() + this.pieceInMove.getRow())/2;
+            }
+        }
+        
+        if(this.pieceInMove.getColumn() < tileBtn.getColumn()) {
+            if(tileBtn.getColumn() - this.pieceInMove.getColumn() == 2) {
+                column = (tileBtn.getColumn() + this.pieceInMove.getColumn())/2;
+            }
+        } else {
+            if(this.pieceInMove.getColumn() - tileBtn.getColumn() == 2) {
+                column = (tileBtn.getColumn() + this.pieceInMove.getColumn())/2;
+            }
+        }
+        
+        if(row != -1 && column != -1) {
+            Piece piece = this.squareBtns[row][column].getBoardPiece();
+            if(!this.controllerObject.itIsMyTurn()) {
+                this.controllerObject.getPlayer().removeStake(piece);
+                checkIfLose(this.controllerObject.getPlayer().getPieces().size());
+            }
+            this.squareBtns[row][column].setIcon(new ImageIcon(""));
+            this.squareBtns[row][column].setBoardPiece(null);
+        }
+
     }
 
-    private void checkIfPlayerCanEat() {
-        // for(Piece piece : this.playerInTurn.getPieces()) {
-        //     if(this.playerInTurn.getPlayerNumber() == 1) {
-        //         checkEatQuadrant1(piece.getRow(), piece.getColumn());
-        //         checkEatQuadrant2(piece.getRow(), piece.getColumn());
-        //         if(piece.getIsKing()) {
-        //             checkEatQuadrant3(piece.getRow(), piece.getColumn());
-        //             checkEatQuadrant4(piece.getRow(), piece.getColumn());
-        //         }
-        //     } else {
-        //         checkEatQuadrant3(piece.getRow(), piece.getColumn());
-        //         checkEatQuadrant4(piece.getRow(), piece.getColumn());
-        //         if(piece.getIsKing()) {
-        //             checkEatQuadrant1(piece.getRow(), piece.getColumn());
-        //             checkEatQuadrant2(piece.getRow(), piece.getColumn());
-        //         }
-        //     }
-        // }
+    public void checkIfPlayerCanEat() {
+        for(Piece piece : this.controllerObject.getPlayer().getPieces()) {
+            if(this.controllerObject.getPlayer().getPlayerNumber() == 1) {
+                checkEatQuadrant1(piece.getRow(), piece.getColumn());
+                checkEatQuadrant2(piece.getRow(), piece.getColumn());
+                if(piece.getIsKing()) {
+                    checkEatQuadrant3(piece.getRow(), piece.getColumn());
+                    checkEatQuadrant4(piece.getRow(), piece.getColumn());
+                }
+            } else {
+                checkEatQuadrant3(piece.getRow(), piece.getColumn());
+                checkEatQuadrant4(piece.getRow(), piece.getColumn());
+                if(piece.getIsKing()) {
+                    checkEatQuadrant1(piece.getRow(), piece.getColumn());
+                    checkEatQuadrant2(piece.getRow(), piece.getColumn());
+                }
+            }
+        }
     }
 
     private void checkEatQuadrant1(int row, int column) {
-        // if(row-1 >= 0  && column+1 < this.numerOfSquares) {
-        //     if(this.squareBtns[row-1][column+1].getBoardPiece() != null) {
-        //         if(row-2 >= 0 && column+2 < this.numerOfSquares) {
-        //             if(this.squareBtns[row-1][column+1].getBoardPiece().getPlayer() != this.playerInTurn) {
-        //                 if(this.squareBtns[row-2][column+2].getBoardPiece() == null) {
-        //                     this.squareBtns[row-2][column+2].setBackground(Color.RED);
-        //                     this.possibleMoves.add(this.squareBtns[row-2][column+2]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(row-1 >= 0  && column+1 < this.boardSize) {
+            if(this.squareBtns[row-1][column+1].getBoardPiece() != null) {
+                if(row-2 >= 0 && column+2 < this.boardSize) {
+                    if(this.squareBtns[row-1][column+1].getBoardPiece().getPlayer() == null) {
+                        if(this.squareBtns[row-2][column+2].getBoardPiece() == null) {
+                            this.squareBtns[row-2][column+2].setBackground(Color.RED);
+                            this.possibleMoves.add(this.squareBtns[row-2][column+2]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkEatQuadrant2(int row, int column) {
-        // if(row-1 >= 0 && column-1 >= 0) {
-        //     if(this.squareBtns[row-1][column-1].getBoardPiece() != null) {
-        //         if(row-2 >= 0 && column-2 >= 0) {
-        //             if(this.squareBtns[row-1][column-1].getBoardPiece().getPlayer() != this.playerInTurn) {
-        //                 if(this.squareBtns[row-2][column-2].getBoardPiece() == null) {
-        //                     this.squareBtns[row-2][column-2].setBackground(Color.RED);
-        //                     this.possibleMoves.add(this.squareBtns[row-2][column-2]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(row-1 >= 0 && column-1 >= 0) {
+            if(this.squareBtns[row-1][column-1].getBoardPiece() != null) {
+                if(row-2 >= 0 && column-2 >= 0) {
+                    if(this.squareBtns[row-1][column-1].getBoardPiece().getPlayer() == null) {
+                        if(this.squareBtns[row-2][column-2].getBoardPiece() == null) {
+                            this.squareBtns[row-2][column-2].setBackground(Color.RED);
+                            this.possibleMoves.add(this.squareBtns[row-2][column-2]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkEatQuadrant3(int row, int column) {
-        // if(row+1 < this.numerOfSquares && column-1 >= 0) {
-        //     if(this.squareBtns[row+1][column-1].getBoardPiece() != null) {
-        //         if(row+2 < this.numerOfSquares && column-2 >= 0) {
-        //             if(this.squareBtns[row+1][column-1].getBoardPiece().getPlayer() != this.playerInTurn) {
-        //                 if(this.squareBtns[row+2][column-2].getBoardPiece() == null) {
-        //                     this.squareBtns[row+2][column-2].setBackground(Color.RED);
-        //                     this.possibleMoves.add(this.squareBtns[row+2][column-2]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(row+1 < this.boardSize && column-1 >= 0) {
+            if(this.squareBtns[row+1][column-1].getBoardPiece() != null) {
+                if(row+2 < this.boardSize && column-2 >= 0) {
+                    if(this.squareBtns[row+1][column-1].getBoardPiece().getPlayer() == null) {
+                        if(this.squareBtns[row+2][column-2].getBoardPiece() == null) {
+                            this.squareBtns[row+2][column-2].setBackground(Color.RED);
+                            this.possibleMoves.add(this.squareBtns[row+2][column-2]);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private void checkEatQuadrant4(int row, int column) {
-        // if(row+1 < this.numerOfSquares && column+1 < this.numerOfSquares) {
-        //     if(this.squareBtns[row+1][column+1].getBoardPiece() != null) {
-        //         if(row+2 < this.numerOfSquares && column+2 < this.numerOfSquares) {
-        //             if(this.squareBtns[row+1][column+1].getBoardPiece().getPlayer() != this.playerInTurn) {
-        //                 if(this.squareBtns[row+2][column+2].getBoardPiece() == null) {
-        //                     this.squareBtns[row+2][column+2].setBackground(Color.RED);
-        //                     this.possibleMoves.add(this.squareBtns[row+2][column+2]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if(row+1 < this.boardSize && column+1 < this.boardSize) {
+            if(this.squareBtns[row+1][column+1].getBoardPiece() != null) {
+                if(row+2 < this.boardSize && column+2 < this.boardSize) {
+                    if(this.squareBtns[row+1][column+1].getBoardPiece().getPlayer() == null) {
+                        if(this.squareBtns[row+2][column+2].getBoardPiece() == null) {
+                            this.squareBtns[row+2][column+2].setBackground(Color.RED);
+                            this.possibleMoves.add(this.squareBtns[row+2][column+2]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
