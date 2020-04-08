@@ -236,7 +236,6 @@ public class Board extends JFrame {
             checkIfCrowned(tileBtn);
             this.pieceInMove = null;
             this.possibleMoves.clear();
-            this.controllerObject.checkWinner();
             this.controllerObject.changeTurn();
         }
     }
@@ -250,10 +249,8 @@ public class Board extends JFrame {
     
     public void checkIfLose(int piecesLeft) {
         if(piecesLeft == 11) {
-            if(this.controllerObject.itIsMyTurn()) {
-                System.out.println("I Lose");
-            } else {
-                System.out.println("I Won");
+            if(!this.controllerObject.itIsMyTurn()) {
+                this.controllerObject.showLooser(this.controllerObject.getPlayer().getPlayerNumber());
             }
         }
         // this.winnerLabel.setText("PLAYER " + player.getName() + " WON!!!");
@@ -276,20 +273,23 @@ public class Board extends JFrame {
 
     public void checkPossibleMoves() {
         this.squareBtns[this.pieceInMove.getRow()][this.pieceInMove.getColumn()].setBackground(Color.decode("#add8e6"));
-        this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()][this.pieceInMove.getColumn()]);
-        if(this.pieceInMove.isPlayerOne()) {
-            checkMoveQuadrant1();
-            checkMoveQuadrant2();
-            if(this.pieceInMove.getIsKing()) {
-                checkMoveQuadrant3();
-                checkMoveQuadrant4();
+        Piece piece = this.squareBtns[this.pieceInMove.getRow()][this.pieceInMove.getColumn()].getBoardPiece();
+
+
+        this.possibleMoves.add(this.squareBtns[piece.getRow()][piece.getColumn()]);
+        if(piece.isPlayerOne()) {
+            checkMoveQuadrant1(piece);
+            checkMoveQuadrant2(piece);
+            if(piece.getIsKing()) {
+                checkMoveQuadrant3(piece);
+                checkMoveQuadrant4(piece);
             }
         } else {
-            checkMoveQuadrant3();
-            checkMoveQuadrant4();
-            if(this.pieceInMove.getIsKing()) {
-                checkMoveQuadrant1();
-                checkMoveQuadrant2();
+            checkMoveQuadrant3(piece);
+            checkMoveQuadrant4(piece);
+            if(piece.getIsKing()) {
+                checkMoveQuadrant1(piece);
+                checkMoveQuadrant2(piece);
             }
         }
     }
@@ -299,19 +299,19 @@ public class Board extends JFrame {
             btn.setBackground(Color.BLACK);
         }
     }
-
-    private void checkMoveQuadrant1() {
-        if(this.pieceInMove.getRow()-1 >= 0  && this.pieceInMove.getColumn()+1 < this.boardSize) {
-            if(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
-                this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].setBackground(Color.decode(movementColor));
-                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
+    
+    private void checkMoveQuadrant1(Piece piece) {
+        if(piece.getRow()-1 >= 0  && piece.getColumn()+1 < this.boardSize) {
+            if(this.squareBtns[piece.getRow()-1][piece.getColumn()+1].getBoardPiece() == null) {
+                this.squareBtns[piece.getRow()-1][piece.getColumn()+1].setBackground(Color.decode(movementColor));
+                this.possibleMoves.add(this.squareBtns[piece.getRow()-1][piece.getColumn()+1]);
             } else {
-                if(this.pieceInMove.getRow()-2 >= 0 && this.pieceInMove.getColumn()+2 < this.boardSize) {
-                    if(!this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-                        if(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
-                            this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2].setBackground(Color.decode(movementColor));
-                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2]);
-                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()+1]);
+                if(piece.getRow()-2 >= 0 && piece.getColumn()+2 < this.boardSize) {
+                    if(!this.squareBtns[piece.getRow()-1][piece.getColumn()+1].getBoardPiece().isSamePlayer(piece)) {
+                        if(this.squareBtns[piece.getRow()-2][piece.getColumn()+2].getBoardPiece() == null) {
+                            this.squareBtns[piece.getRow()-2][piece.getColumn()+2].setBackground(Color.decode(movementColor));
+                            this.possibleMoves.add(this.squareBtns[piece.getRow()-2][piece.getColumn()+2]);
+                            this.eatMoves.put(this.squareBtns[piece.getRow()-2][piece.getColumn()+2], this.squareBtns[piece.getRow()-1][piece.getColumn()+1]);
                         }
                     }
                 }
@@ -319,18 +319,18 @@ public class Board extends JFrame {
         }
     }
 
-    private void checkMoveQuadrant2() {
-        if(this.pieceInMove.getRow()-1 >= 0 && this.pieceInMove.getColumn()-1 >= 0) {
-            if(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()-1].getBoardPiece() == null) {
-                this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()-1].setBackground(Color.decode(movementColor));
-                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()-1]);
+    private void checkMoveQuadrant2(Piece piece) {
+        if(piece.getRow()-1 >= 0 && piece.getColumn()-1 >= 0) {
+            if(this.squareBtns[piece.getRow()-1][piece.getColumn()-1].getBoardPiece() == null) {
+                this.squareBtns[piece.getRow()-1][piece.getColumn()-1].setBackground(Color.decode(movementColor));
+                this.possibleMoves.add(this.squareBtns[piece.getRow()-1][piece.getColumn()-1]);
             } else {
-                if(this.pieceInMove.getRow()-2 >= 0 && this.pieceInMove.getColumn()-2 >= 0) {
-                    if(!this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()-1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-                        if(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()-2].getBoardPiece() == null) {
-                            this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()-2].setBackground(Color.decode(movementColor));
-                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()-2]);
-                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()-2][this.pieceInMove.getColumn()-2], this.squareBtns[this.pieceInMove.getRow()-1][this.pieceInMove.getColumn()-1]);
+                if(piece.getRow()-2 >= 0 && piece.getColumn()-2 >= 0) {
+                    if(!this.squareBtns[piece.getRow()-1][piece.getColumn()-1].getBoardPiece().isSamePlayer(piece)) {
+                        if(this.squareBtns[piece.getRow()-2][piece.getColumn()-2].getBoardPiece() == null) {
+                            this.squareBtns[piece.getRow()-2][piece.getColumn()-2].setBackground(Color.decode(movementColor));
+                            this.possibleMoves.add(this.squareBtns[piece.getRow()-2][piece.getColumn()-2]);
+                            this.eatMoves.put(this.squareBtns[piece.getRow()-2][piece.getColumn()-2], this.squareBtns[piece.getRow()-1][piece.getColumn()-1]);
                         }
                     }
                 }
@@ -338,18 +338,18 @@ public class Board extends JFrame {
         }
     }
     
-    private void checkMoveQuadrant3() {
-        if(this.pieceInMove.getRow()+1 < this.boardSize && this.pieceInMove.getColumn()-1 >= 0) {
-            if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece() == null) {
-                this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].setBackground(Color.decode(movementColor));
-                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
+    private void checkMoveQuadrant3(Piece piece) {
+        if(piece.getRow()+1 < this.boardSize && piece.getColumn()-1 >= 0) {
+            if(this.squareBtns[piece.getRow()+1][piece.getColumn()-1].getBoardPiece() == null) {
+                this.squareBtns[piece.getRow()+1][piece.getColumn()-1].setBackground(Color.decode(movementColor));
+                this.possibleMoves.add(this.squareBtns[piece.getRow()+1][piece.getColumn()-1]);
             } else {
-                if(this.pieceInMove.getRow()+2 < this.boardSize && this.pieceInMove.getColumn()-2 >= 0) {
-                    if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-                        if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].getBoardPiece() == null) {
-                            this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2].setBackground(Color.decode(movementColor));
-                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2]);
-                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()-2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()-1]);
+                if(piece.getRow()+2 < this.boardSize && piece.getColumn()-2 >= 0) {
+                    if(!this.squareBtns[piece.getRow()+1][piece.getColumn()-1].getBoardPiece().isSamePlayer(piece)) {
+                        if(this.squareBtns[piece.getRow()+2][piece.getColumn()-2].getBoardPiece() == null) {
+                            this.squareBtns[piece.getRow()+2][piece.getColumn()-2].setBackground(Color.decode(movementColor));
+                            this.possibleMoves.add(this.squareBtns[piece.getRow()+2][piece.getColumn()-2]);
+                            this.eatMoves.put(this.squareBtns[piece.getRow()+2][piece.getColumn()-2], this.squareBtns[piece.getRow()+1][piece.getColumn()-1]);
                         }
                     }
                 }
@@ -357,18 +357,18 @@ public class Board extends JFrame {
         }
     }
     
-    private void checkMoveQuadrant4() {
-        if(this.pieceInMove.getRow()+1 < this.boardSize && this.pieceInMove.getColumn()+1 < this.boardSize) {
-            if(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece() == null) {
-                this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].setBackground(Color.decode("#add8e6"));
-                this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
+    private void checkMoveQuadrant4(Piece piece) {
+        if(piece.getRow()+1 < this.boardSize && piece.getColumn()+1 < this.boardSize) {
+            if(this.squareBtns[piece.getRow()+1][piece.getColumn()+1].getBoardPiece() == null) {
+                this.squareBtns[piece.getRow()+1][piece.getColumn()+1].setBackground(Color.decode("#add8e6"));
+                this.possibleMoves.add(this.squareBtns[piece.getRow()+1][piece.getColumn()+1]);
             } else {
-                if(this.pieceInMove.getRow()+2 < this.boardSize && this.pieceInMove.getColumn()+2 < this.boardSize) {
-                    if(!this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1].getBoardPiece().isSamePlayer(this.pieceInMove)) {
-                        if(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].getBoardPiece() == null) {
-                            this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2].setBackground(Color.decode("#add8e6"));
-                            this.possibleMoves.add(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2]);
-                            this.eatMoves.put(this.squareBtns[this.pieceInMove.getRow()+2][this.pieceInMove.getColumn()+2], this.squareBtns[this.pieceInMove.getRow()+1][this.pieceInMove.getColumn()+1]);
+                if(piece.getRow()+2 < this.boardSize && piece.getColumn()+2 < this.boardSize) {
+                    if(!this.squareBtns[piece.getRow()+1][piece.getColumn()+1].getBoardPiece().isSamePlayer(piece)) {
+                        if(this.squareBtns[piece.getRow()+2][piece.getColumn()+2].getBoardPiece() == null) {
+                            this.squareBtns[piece.getRow()+2][piece.getColumn()+2].setBackground(Color.decode("#add8e6"));
+                            this.possibleMoves.add(this.squareBtns[piece.getRow()+2][piece.getColumn()+2]);
+                            this.eatMoves.put(this.squareBtns[piece.getRow()+2][piece.getColumn()+2], this.squareBtns[piece.getRow()+1][piece.getColumn()+1]);
                         }
                     }
                 }
@@ -489,6 +489,30 @@ public class Board extends JFrame {
                 }
             }
         }
+    }
+
+    public void printWinner(int winnerPlayerNumber) {
+        System.out.println("Aaaand the winner is ! " + winnerPlayerNumber);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                String winnerText = "";
+                if(winnerPlayerNumber == controllerObject.getPlayer().getPlayerNumber()) {
+                    winnerText = "YOU WON";
+                } else {
+                    winnerText = "YOU LOSE";
+                }
+                statusLabel.setText("<html><body style='text-align:center;'>" + winnerText + "</body></html>");
+
+                initPanel.setVisible(true);
+                boardPanel.setVisible(false);
+                newGameBtn.setVisible(true);
+                masterPanel.remove(boardPanel);
+                initPanel.add(newGameBtn);
+                masterPanel.add(initPanel);
+                // createBoard();
+                // setPlayers();
+            }
+        });
     }
 
 }

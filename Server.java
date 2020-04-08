@@ -50,7 +50,27 @@ public class Server implements Runnable{
             transmit(modelUpdater);
         }
     }
-    
+
+    public void updateModel(ModelUpdater updater) {
+        System.out.println(updater.getGameState());
+        if(updater.getGameState() == 2) {
+            if(this.modelObject.getPlayerInTurn() == 1) {
+                this.modelObject.setPlayerInTurn(2);
+            } else {
+                this.modelObject.setPlayerInTurn(1);
+            }
+        } else if(updater.getGameState() == 3) {
+            // for(Player player : this.modelObject.getPlayers()) {
+            if(updater.getNumOfPlayer() == 1) {
+                updater.setNumOfPlayer(2);
+            } else {
+                updater.setNumOfPlayer(1);
+            }
+            // }
+        }
+        this.transmit(updater);
+    }
+
     public void transmit(ModelUpdater updater) {
         for(ClientRunner c: clients) {
             if(c != null) {

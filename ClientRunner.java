@@ -26,7 +26,7 @@ public class ClientRunner implements Runnable {
         try {
             ModelUpdater updater = null;
             while((updater = (ModelUpdater)inputStream.readObject())!= null) {
-                this.parent.transmit(updater);
+                this.parent.updateModel(updater);
             }
             inputStream.close();
         }catch(ClassNotFoundException e) {

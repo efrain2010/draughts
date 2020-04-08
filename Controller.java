@@ -96,12 +96,14 @@ public class Controller implements ActionListener {
             }
         } else {
             if(e.getSource() == this.board.getNewGameBtn()) {
-                System.out.println(this.connectedPlayer);
                 System.out.println("NEW GAME!!!");
-                this.board.setNewGame();
-            } else if(e.getSource() == this.board.getEndGameBtn()) {
-                System.out.println("end game :(");
-                this.board.endGame();
+                ModelUpdater boardUp = new ModelUpdater(this.player.getPlayerNumber());
+                boardUp.setGameState(1);
+                try {
+                    this.parent.getOutputStream().writeObject(boardUp);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
@@ -110,12 +112,24 @@ public class Controller implements ActionListener {
         System.out.println(coords[0]);
     }
 
-    public void checkWinner() {
+    public void showLooser(int playerNumber) {
+        System.out.println("Sending looser player " + playerNumber);
+        ModelUpdater boardUp = new ModelUpdater(playerNumber);
+        boardUp.setGameState(3);
+        try {
+            this.parent.getOutputStream().writeObject(boardUp);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         // if(this.board.getPlayerOne().getPieces().size() <= 0) {
         //     this.board.showWinner(this.board.getPlayerTwo());
         // } else if (this.board.getPlayerTwo().getPieces().size() <= 0) {
         //     this.board.showWinner(this.board.getPlayerOne());
         // }
+    }
+
+    public void printWinner(int winnerPlayerNumber) {
+        this.board.printWinner(winnerPlayerNumber);
     }
 
     public void changeTurn() {

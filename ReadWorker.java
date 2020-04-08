@@ -31,16 +31,9 @@ public class ReadWorker extends SwingWorker<Void, Void> {
                     System.out.println("Starting Game");
                     this.parent.getController().startGame(updater.getBoardSize());
                 } else if(updater.getGameState() == 2) { 
-                    // if(updater.getSendingCoords()) {
-                        this.parent.getController().movePiece(updater.getPrevRow(), updater.getPrevColumn(), updater.getNewRow(), updater.getNewColumn());
-                        
-                        // TileBtn prevTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getPrevRow()][updater.getPrevColumn()];
-                        // TileBtn nextTileBtn = (TileBtn) this.parent.getController().getBoard().getSquareBtns()[updater.getNewRow()][updater.getNewColumn()];
-                        // this.parent.getController().movePiece(prevTileBtn, nextTileBtn);
-                        // // this.parent.getController().getBoard().movePieceByCoords(updater.getPrevRow(),updater.getPrevColumn());
-                    // } else {
-                    //     this.parent.getController().setPlayer(updater.getNumOfPlayer());
-                    // }
+                    this.parent.getController().movePiece(updater.getPrevRow(), updater.getPrevColumn(), updater.getNewRow(), updater.getNewColumn());
+                } else if(updater.getGameState() == 3) { 
+                    this.parent.getController().printWinner(updater.getNumOfPlayer());
                 }
             }
         } catch (ClassNotFoundException e) {
